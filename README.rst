@@ -22,10 +22,11 @@ Open your browser and point it at:
 
 These are three different read requests at different addresses. ``0x0`` generates a random number, ``0x1`` returns the minimum integer for the generator, and ``0x2`` returns the maximum integer for the generator. To see that this is the case, you can open up a new terminal, run python, and type the following::
 
-  from ironman.constructs.ipbus import IPBusConstruct
-  url = 'http://localhost:7777/ipbus/200000f0/2000010f/00000000'
-  raw = url.split('ipbus')[-1].replace('/','')
-  p = IPBusConstruct.parse(raw.decode('hex'))
+  >>> from ironman.constructs.ipbus import IPBusConstruct
+  >>> url = 'http://localhost:7777/ipbus/200000f0/2000010f/00000000'
+  >>> raw = url.split('ipbus')[-1].replace('/','')
+  >>> p = IPBusConstruct.parse(raw.decode('hex'))
+  >>> print p
   Container:
       header = Container:
 	  protocol_version = 2
@@ -46,15 +47,16 @@ These are three different read requests at different addresses. ``0x0`` generate
 
 which dumps an understandable representation of the request itself. Now, let's make a write request to set the upper limit of the random number generator to 15. Continuing with the above example...::
 
-  from ironman.constructs.ipbus import IPBusConstruct
-  raw = '200000f02000010f00000000'
-  p = IPBusConstruct.parse(raw.decode('hex'))
-  p.data[0].type_id = 'WRITE'
-  p.data[0].address = 0x2
-  p.data[0].data = [15]
-  new_raw = IPBusConstruct.build(p).encode('hex')
-  new_url = 'http://localhost:7777/ipbus/{0:s}'.format('/'.join([new_raw[i:i+8] for i in range(0, len(new_raw), 8)]))
-  print new_url
+  >>> from ironman.constructs.ipbus import IPBusConstruct
+  >>> raw = '200000f02000010f00000000'
+  >>> p = IPBusConstruct.parse(raw.decode('hex'))
+  >>> p.data[0].type_id = 'WRITE'
+  >>> p.data[0].address = 0x2
+  >>> p.data[0].data = [15]
+  >>> new_raw = IPBusConstruct.build(p).encode('hex')
+  >>> new_url = 'http://localhost:7777/ipbus/{0:s}'.format('/'.join([new_raw[i:i+8] for i in range(0, len(new_raw), 8)]))
+  >>> print new_url
+  http://localhost:7777/ipbus/200000f0/2000011f/00000002/0000000f
 
 which gives me the following URL
 
