@@ -142,4 +142,5 @@ http_ipbus_root = HTTPIPBusRoot()
 http_ipbus_root.putChild('ipbus', HTTPIPBus())
 reactor.listenTCP(7777, Site(http_ipbus_root))
 
+print "Running the reactor now... (infinite loop). CTRL+C to quit."
 reactor.run()
