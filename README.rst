@@ -69,3 +69,22 @@ to read the value again, verify that it has been set, and then refresh
 - http://localhost:7777/ipbus/200000f0/2000010f/00000000
 
 over and over again to see the changes take effect immediately.
+
+Random number generator
+-----------------------
+
+.. code::
+
+  class RandomNumberGeneratorController:
+    __low__  = 0
+    __high__ = 9
+    def read(self, offset, size):
+      if offset == 0x0: return str(random.randint(self.__class__.__low__, self.__class__.__high__))[:size*4].rjust(4, "\0")
+      elif offset == 0x1: return str(self.__class__.__low__)[:size*4].rjust(4, "\0")
+      elif offset == 0x2: return str(self.__class__.__high__)[:size*4].rjust(4, "\0")
+
+    def write(self, offset, data):
+      if offset == 0x0: pass
+      elif offset == 0x1: self.__class__.__low__ = int(data[0])
+      elif offset == 0x2: self.__class__.__high__ = int(data[0])
+      return
