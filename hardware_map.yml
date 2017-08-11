@@ -1,0 +1,11 @@
+nodes:
+  -
+    id: random_number_generator
+    address: 0x00000000
+    nodes:
+      - {id: generate, address: 0x0, permissions: 1} # read-only
+      - {id: low_val, address: 0x1, permissions: 2} # read/write
+      -
+        id: high_val
+        address: 0x2
+        permissions: 2 # read/write
