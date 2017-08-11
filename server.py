@@ -11,6 +11,18 @@ j.set_hardware_manager(manager)
 
 @j.register('main')
 class RandomNumberGeneratorController:
+  ''' This is a random number generator controller.
+
+  This is meant to represent how easy it is to maintain a register "per-class", but
+  also hook in read/write data access in a way that can be maintained with modularity
+
+  __low__ is the low value for random integer generator
+  __high__ is the high value for random integer generator
+
+  0x0 = generate a random integer, read only (writes do nothing)
+  0x1 = read/write the low value
+  0x2 = read/write the high value
+  '''
   __low__  = 0
   __high__ = 9
   def read(self, offset, size):
@@ -32,17 +44,12 @@ class RandomNumberGeneratorController:
       self.__class__.__high__ = int(data[0])
       return
 
+# just assume for now it's an instant success
 def buildResponsePacket(packet):
     packet.response.data[0].info_code = 'SUCCESS'
-    #packet.response.data[0].data = [packet.response.data[0].data]
     return IPBusConstruct.build(packet.response)
-    # data += PacketHeaderStruct.build(packet.response.header)
-    # for transaction, response in zip(packet.response.data, packet.response):
-    #     data += ControlHeaderStruct.build(transaction)
-    #     data += response.encode("hex").decode("hex")
-    return data
 
-
+# if you want to add history and log anything, use this
 from ironman.history import History
 h = History()
 
@@ -51,12 +58,12 @@ from ironman.packet import IPBusPacket
 from twisted.internet import reactor
 from twisted.internet.defer import Deferred
 
+'''Set up IPBus UDP @ Port 8888'''
 def deferredGenerator():
     return Deferred().addCallback(IPBusPacket).addCallback(j).addCallback(buildResponsePacket)#.addCallback(h.record)
-
 reactor.listenUDP(8888, ServerFactory('udp', deferredGenerator))
 
-'''set up a mirror web server for IPBus requests'''
+'''set up a proxy HTTP server for IPBus requests'''
 # Site, an IProtocolFactory which glues a listening server port (IListeningPort) to the HTTPChannel implementation
 from twisted.web.server import Site
 from twisted.web.resource import Resource
